@@ -1,5 +1,5 @@
 # WriteIt
-💻 Lightweight static HTML page generator for blogs
+💻 CLI static HTML page generator for blogs
 
 Given a template `writeit_page_template.html` file containing an empty `id=writeit_dynamic_content` `div` and a list of content html files, WriteIt will generate HTML files with containing such contents surrounded by the template. This is used by https://swiftrocks.com to effortlessly publish a static website where all pages look the same:
 
