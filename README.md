@@ -27,7 +27,7 @@ Just download the latest release from this repo and paste it wherever you want t
 
 Structure your folder like the following picture:
 
-<img src="https://i.imgur.com/KZ7uVWO.png" width=400>
+<img src="https://i.imgur.com/KyDHQr7.png" width=400>
 
 `writeit_page_template.html` should contain the outside "shell" that's going to be applied to each page, with the actual dynamic section being completely empty and surrounded by a `writeit_dynamic_content` `div`:
 
