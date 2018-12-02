@@ -7,7 +7,7 @@ Given a template `writeit_page_template.html` file containing an empty `id=write
 
 It can also be used to bootstrap new posts by automatically creating such content html files via the use of a `writeit_stub_template.html` that contains the shared basic structure of your posts:
 
-```
+``` html
 <title>$writeit_post_name - My Blog</title>
 <div id="header">
   <h1>$writeit_post_name</h1>
@@ -31,7 +31,7 @@ Structure your folder like the following picture:
 
 `writeit_page_template.html` should contain the outside "shell" that's going to be applied to each page, with the actual dynamic section being completely empty and surrounded by a `writeit_dynamic_content` `div`:
 
-```
+``` html
 <html>
   <body>
     <h3>My super blog</h3>
