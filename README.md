@@ -10,7 +10,7 @@ WriteIt can also be used to bootstrap the creation of new blog posts given a `wr
 ``` html
 <!--Add here the additional properties that you want each page to possess.-->
 <!--These properties can be used to change content in the template page or in the page itself as shown here.-->
-<!--Properties must start with 'WRITE_IT_POST'.-->
+<!--Properties must start with 'WRITEIT_POST'.-->
 <!--Writeit provides and injects WRITEIT_POST_NAME and WRITEIT_POST_HTML_NAME by default.-->
 
 <!--WRITEIT_POST_SHORT_DESCRIPTION-->
