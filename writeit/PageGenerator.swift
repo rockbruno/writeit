@@ -2,7 +2,7 @@ import Foundation
 
 final class PageGenerator {
 
-    static let path = "./public"
+    static var path = "./public"
 
     init() {}
     func run() {
