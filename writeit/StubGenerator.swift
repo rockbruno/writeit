@@ -13,7 +13,7 @@ final class StubGenerator {
         let templateContents = File.stubTemplate.contents
         print("Name of the new post: ", terminator: "")
         let name = readLine() ?? ""
-        let fileName = generateFileName(forPostName: name) + ".html"
+        let fileName = generateFileName(forPostName: name)
         let customPropertyNames = StubGenerator.customProperties(fromStub: templateContents)
         let customPropertyValues: [String] = customPropertyNames.map {
             print("Value for \($0): ", terminator: "")
@@ -32,7 +32,7 @@ final class StubGenerator {
         properties.forEach {
             add(value: $0.1, key: $0.0, toStub: &stub)
         }
-        stub.write(toPath: StubGenerator.path + "/" + fileName)
+        stub.write(toPath: StubGenerator.path + "/" + fileName + ".html")
     }
 
     func generateFileName(forPostName name: String) -> String {
