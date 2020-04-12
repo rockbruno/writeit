@@ -72,7 +72,7 @@ final class PageGenerator {
         let date = dateFormatter.date(from:sitemapDate)!
         let rssFormatter = DateFormatter()
         rssFormatter.locale = dateFormatter.locale
-        rssFormatter.dateFormat = "E, d MMM yyyy hh:mm:ss z"
+        rssFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss z"
         let rssDateString = rssFormatter.string(from: date)
 
         let contents = stub.replace(properties: stub.properties)
