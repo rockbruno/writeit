@@ -5,19 +5,27 @@ final class PageGenerator {
     static var path = "./public"
 
     init() {}
+
     func run() {
         let templateContents = File.pageTemplate.contents
-        let stubs = FileManager.files(atPath: StubGenerator.path, suffix: ".html")
+        // Leave index for last to make adding the structured json easier
+        let stubs = FileManager.files(atPath: StubGenerator.path, suffix: ".html").sorted {
+            $0.name != "index.html" || $1.name != "index.html"
+        }
         guard stubs.isEmpty == false else {
             print("Error: There are no stubs to generate files from in this folder.")
             exit(1)
         }
         var rssContent = [(Date, String)]()
         var siteMapContent = [(Date, String)]()
+        var jsons = [(Date, String)]()
         stubs.forEach { stub in
             autoreleasepool {
                 let contents = stub.contents
-                let page = generate(fromStub: contents, template: templateContents)
+                let structuredJsonData = structuredJson(fromStub: contents)
+                let json = stub.name != "index.html" ? structuredJsonData.1 : finalStructuredJson(data: jsons)
+                jsons.append(structuredJsonData)
+                let page = generate(fromStub: contents, template: templateContents, json: json)
                 page.write(toPath: PageGenerator.path + "/" + stub.name)
                 addToRss(&rssContent, &siteMapContent, stub: contents)
             }
@@ -28,7 +36,50 @@ final class PageGenerator {
         siteMap.write(toPath: PageGenerator.path + "/sitemap.xml")
     }
 
-    func generate(fromStub stub: String, template: String) -> String {
+    func structuredJson(fromStub stub: String) -> (Date, String) {
+        let dict = [String:String](uniqueKeysWithValues: stub.properties)
+        let title = dict["WRITEIT_POST_NAME"] ?? "No Title"
+        let desc = dict["WRITEIT_POST_SHORT_DESCRIPTION"] ?? "No Description"
+        let sitemapDate = dict["WRITEIT_POST_SITEMAP_DATE"] ?? "No Date"
+        let lastMod = dict["WRITEIT_POST_SITEMAP_DATE_LAST_MOD"] ?? "No Date"
+        let html = dict["WRITEIT_POST_HTML_NAME"] ?? "No html"
+        return (sitemapDate.sitemapDate, """
+        {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://swiftrocks.com/\(html)"
+        },
+        "image": [
+          "https://swiftrocks.com/images/bg/swiftrockssocial.png"
+        ],
+        "datePublished": "\(sitemapDate)",
+        "dateModified": "\(lastMod)",
+        "author": {
+          "@type": "Person",
+          "name": "Bruno Rocha"
+        },
+         "publisher": {
+          "@type": "Organization",
+          "name": "SwiftRocks",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://swiftrocks.com/images/bg/swiftrockssocial.png"
+          }
+        },
+        "headline": "\(title)",
+            "abstract": "\(desc.replacingOccurrences(of: "\"", with: "'"))"
+        }
+        """)
+    }
+
+    func finalStructuredJson(data: [(Date, String)]) -> String {
+        let jsons = data.sorted { $0.0 > $1.0 }.map { $0.1 }
+        return "[" + jsons.joined(separator: ",") + "]"
+    }
+
+    func generate(fromStub stub: String, template: String, json: String) -> String {
         let identifier = "id=\"WRITEIT_DYNAMIC_CONTENT\">"
         guard let startingPos = template.range(of: identifier) else {
             print("Error: Could not locate the dynamic content div inside the template.")
@@ -37,7 +88,8 @@ final class PageGenerator {
         let prefix = String(template[template.startIndex..<startingPos.upperBound])
         let suffix = String(template[startingPos.upperBound...])
         let rawPage = prefix + stub + suffix
-        let stubProperties = stub.properties
+        var stubProperties = stub.properties
+        stubProperties.append(("WRITEIT_POST_STRUCTURED_JSON", json))
         return rawPage.replace(properties: stubProperties)
     }
 
@@ -60,18 +112,32 @@ final class PageGenerator {
 
         let title = dict["WRITEIT_POST_NAME"] ?? "No Title"
         let sitemapDate = dict["WRITEIT_POST_SITEMAP_DATE"] ?? "No Date"
+        let sitemapDateLastMod = dict["WRITEIT_POST_SITEMAP_DATE_LAST_MOD"] ?? "No Date"
         let html = dict["WRITEIT_POST_HTML_NAME"] ?? "No html"
 
-        if html == "index" {
+        let siteMapItem = """
+        <url>
+            <loc>https://swiftrocks.com/\(html)</loc>
+            <lastmod>\(sitemapDateLastMod)</lastmod>
+            <priority>0.80</priority>
+        </url>
+        <url>
+            <loc>https://swiftrocks.com/\(html).html</loc>
+            <lastmod>\(sitemapDateLastMod)</lastmod>
+            <priority>0.80</priority>
+        </url>
+
+        """
+
+        sitemap.append((sitemapDateLastMod.sitemapDate, siteMapItem))
+
+        if dict["WRITEIT_POST_DONT_RSS"] == "true" {
             return
         }
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        let date = dateFormatter.date(from:sitemapDate)!
+        let date = sitemapDate.sitemapDate
         let rssFormatter = DateFormatter()
-        rssFormatter.locale = dateFormatter.locale
+        rssFormatter.locale = Locale(identifier: "en_US_POSIX")
         rssFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss z"
         let rssDateString = rssFormatter.string(from: date)
 
@@ -88,17 +154,6 @@ final class PageGenerator {
         """
 
         rss.append((date, item))
-
-        let siteMapItem = """
-        <url>
-            <loc>https://swiftrocks.com/\(html)</loc>
-            <lastmod>\(sitemapDate)</lastmod>
-            <priority>0.80</priority>
-        </url>
-
-        """
-
-        sitemap.append((date, siteMapItem))
     }
 
     func end(rss: [(Date, String)]) -> String {
@@ -128,14 +183,7 @@ final class PageGenerator {
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                     http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-        <!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
-
-        <url>
-          <loc>https://swiftrocks.com/</loc>
-          <lastmod>2018-10-29T12:21:52+00:00</lastmod>
-          <priority>1.00</priority>
-        </url>
         """
         siteMapContent.forEach { siteMap += $0 }
         siteMap += "</urlset>"
@@ -169,5 +217,12 @@ extension String {
             page = page.replacingOccurrences(of: "$\($0.0)", with: $0.1)
         }
         return page
+    }
+
+    var sitemapDate: Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return dateFormatter.date(from:self)!
     }
 }
