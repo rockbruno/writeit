@@ -1,12 +1,41 @@
 import Foundation
 
+struct SiteData {
+    let data: [String: String]
+
+    init(data: [String: String]) {
+        self.data = data
+    }
+
+    func get(_ key: String) -> String {
+        guard let value = data[key] else {
+            print("Error: Missing value for key '\(key)'")
+            exit(1)
+        }
+        return value
+    }
+}
+
 final class PageGenerator {
 
-    static var path = "./public"
+    var data: SiteData!
 
-    init() {}
+    init() {
+    }
 
     func run() {
+        let dataContents = File.siteData.contents
+        let dataData = dataContents.components(separatedBy: "\n").map {
+            $0.components(separatedBy: ":")
+        }
+        var dict = [String: String]()
+        for a in dataData {
+            dict[a[0]] = a[1]
+        }
+        self.data = SiteData(data: dict)
+
+
+        let path = data.get("path")
         let templateContents = File.pageTemplate.contents
         // Leave index for last to make adding the structured json easier
         let stubs = FileManager.files(atPath: StubGenerator.path, suffix: ".html").sorted {
@@ -25,15 +54,19 @@ final class PageGenerator {
                 let structuredJsonData = structuredJson(fromStub: contents)
                 let json = stub.name != "index.html" ? structuredJsonData.1 : finalStructuredJson(data: jsons)
                 jsons.append(structuredJsonData)
-                let page = generate(fromStub: contents, template: templateContents, json: json)
-                page.write(toPath: PageGenerator.path + "/" + stub.name)
+                let page = generate(
+                    fromStub: contents,
+                    template: templateContents,
+                    json: json
+                )
+                page.write(toPath: path + "/" + stub.name)
                 addToRss(&rssContent, &siteMapContent, stub: contents)
             }
         }
         let rss = end(rss: rssContent)
-        rss.write(toPath: PageGenerator.path + "/rss.xml")
+        rss.write(toPath: path + "/rss.xml")
         let siteMap = end(siteMap: siteMapContent)
-        siteMap.write(toPath: PageGenerator.path + "/sitemap.xml")
+        siteMap.write(toPath: path + "/sitemap.xml")
     }
 
     func structuredJson(fromStub stub: String) -> (Date, String) {
@@ -49,23 +82,23 @@ final class PageGenerator {
         "@type": "BlogPosting",
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": "https://swiftrocks.com/\(html)"
+          "@id": "https://\(data.get("domain"))/\(html)"
         },
         "image": [
-          "https://swiftrocks.com/images/bg/swiftrockssocial.png"
+          "https://\(data.get("domain")).com/images/logo/logo.png"
         ],
         "datePublished": "\(sitemapDate)",
         "dateModified": "\(lastMod)",
         "author": {
           "@type": "Person",
-          "name": "Bruno Rocha"
+          "name": "\(data.get("owner"))"
         },
          "publisher": {
           "@type": "Organization",
-          "name": "SwiftRocks",
+          "name": "\(data.get("name"))",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://swiftrocks.com/images/bg/swiftrockssocial.png"
+            "url": "https://\(data.get("domain")).com/images/logo/logo.png"
           }
         },
         "headline": "\(title)",
@@ -79,7 +112,11 @@ final class PageGenerator {
         return "[" + jsons.joined(separator: ",") + "]"
     }
 
-    func generate(fromStub stub: String, template: String, json: String) -> String {
+    func generate(
+        fromStub stub: String,
+        template: String,
+        json: String
+    ) -> String {
         let identifier = "id=\"WRITEIT_DYNAMIC_CONTENT\">"
         guard let startingPos = template.range(of: identifier) else {
             print("Error: Could not locate the dynamic content div inside the template.")
@@ -98,12 +135,12 @@ final class PageGenerator {
         <?xml version="1.0" encoding="utf-8"?>
         <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
         <channel>
-            <title>SwiftRocks</title>
-            <description>SwiftRocks is a blog about how Swift works and general iOS tips and tricks.</description>
+            <title>\(data.get("name"))</title>
+            <description>\(data.get("description"))</description>
             <language>en-us</language>
-            <copyright>2019 Bruno Rocha</copyright>
-            <link>https://swiftrocks.com</link>
-            <atom:link href="https://swiftrocks.com/rss.xml" rel="self" type="application/rss+xml"/>
+            <copyright>\(data.get("copyright"))</copyright>
+            <link>https://\(data.get("domain"))</link>
+            <atom:link href="https://\(data.get("domain"))/rss.xml" rel="self" type="application/rss+xml"/>
         """
     }
 
@@ -117,12 +154,12 @@ final class PageGenerator {
 
         let siteMapItem = """
         <url>
-            <loc>https://swiftrocks.com/\(html)</loc>
+            <loc>https://\(data.get("domain"))/\(html)</loc>
             <lastmod>\(sitemapDateLastMod)</lastmod>
             <priority>0.80</priority>
         </url>
         <url>
-            <loc>https://swiftrocks.com/\(html).html</loc>
+            <loc>https://\(data.get("domain"))/\(html).html</loc>
             <lastmod>\(sitemapDateLastMod)</lastmod>
             <priority>0.80</priority>
         </url>
@@ -145,8 +182,8 @@ final class PageGenerator {
         let item = """
         <item>
             <title>\(title)</title>
-            <link>https://swiftrocks.com/\(html)</link>
-            <guid>https://swiftrocks.com/\(html)</guid>
+            <link>https://\(data.get("domain"))/\(html)</link>
+            <guid>https://\(data.get("domain"))/\(html)</guid>
             <pubDate>\(rssDateString)</pubDate>
         <description><![CDATA[\(contents)]]></description>
         </item>
@@ -158,17 +195,7 @@ final class PageGenerator {
 
     func end(rss: [(Date, String)]) -> String {
         let rssContent = rss.sorted { $0.0 > $1.0 }.map { $0.1 }
-        var rss = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-        <channel>
-            <title>SwiftRocks</title>
-            <description>SwiftRocks is a blog about how Swift works and general iOS tips and tricks.</description>
-            <language>en-us</language>
-            <copyright>2019 Bruno Rocha</copyright>
-            <link>https://swiftrocks.com</link>
-            <atom:link href="https://swiftrocks.com/rss.xml" rel="self" type="application/rss+xml"/>
-        """
+        var rss = rssStart()
         rssContent.forEach { rss += $0 }
         rss += "</channel></rss>"
         return rss
@@ -189,6 +216,12 @@ final class PageGenerator {
         siteMap += "</urlset>"
         return siteMap
     }
+}
+
+struct Article: Codable, Hashable {
+    let url: String
+    let name: String
+    let categories: [String]
 }
 
 extension String {

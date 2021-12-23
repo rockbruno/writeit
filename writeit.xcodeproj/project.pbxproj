@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5981D2F12672AAA100962621 /* Localizable.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5981D2EF2672AAA100962621 /* Localizable.plist */; };
 		FD7DFB1921B310A400693D28 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7DFB1821B310A400693D28 /* main.swift */; };
 		FD7DFB2021B311F100693D28 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7DFB1F21B311F100693D28 /* FileManager.swift */; };
 		FD7DFB2221B312D000693D28 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7DFB2121B312D000693D28 /* File.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5981D2F02672AAA100962621 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = English; path = ../../../../../../Applications/dsad/InstallMacOSX/Resources/English.lproj/Localizable.plist; sourceTree = "<group>"; };
 		FD7DFB1521B310A400693D28 /* writeit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = writeit; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD7DFB1821B310A400693D28 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		FD7DFB1F21B311F100693D28 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			children = (
 				FD7DFB1821B310A400693D28 /* main.swift */,
 				FDB3A20221B422C900B70AB0 /* StubGenerator.swift */,
+				5981D2EF2672AAA100962621 /* Localizable.plist */,
 				FD7DFB2321B3142C00693D28 /* PageGenerator.swift */,
 				FD7DFB1F21B311F100693D28 /* FileManager.swift */,
 				FD7DFB2121B312D000693D28 /* File.swift */,
@@ -164,6 +167,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				English,
 			);
 			mainGroup = FD7DFB0C21B310A400693D28;
 			productRefGroup = FD7DFB1621B310A400693D28 /* Products */;
@@ -181,6 +185,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5981D2F12672AAA100962621 /* Localizable.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +218,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		5981D2EF2672AAA100962621 /* Localizable.plist */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5981D2F02672AAA100962621 /* English */,
+			);
+			name = Localizable.plist;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		FD7DFB1A21B310A400693D28 /* Debug */ = {

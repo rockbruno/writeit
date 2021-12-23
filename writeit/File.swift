@@ -2,6 +2,7 @@ import Foundation
 
 struct File: Hashable {
 
+    static let siteData = File(filePath: "./writeit_data.txt")
     static let pageTemplate = File(filePath: "./writeit_page_template.html")
     static let stubTemplate = File(filePath: "./writeit_stub_template.html")
 

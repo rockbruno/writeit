@@ -10,7 +10,11 @@ final class PageGeneratorTests: XCTestCase {
         <div id=\"WRITEIT_DYNAMIC_CONTENT\"></div>
         </div></body>
         """
-        let result = generator.generate(fromStub: testStub, template: testTemplate)
+        let result = generator.generate(
+            fromStub: testStub,
+            template: testTemplate,
+            json: ""
+        )
         XCTAssertEqual(result, """
         <meta name="title" content="My Page">
         <body><div>Template, My Page content:
