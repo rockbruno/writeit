@@ -2,7 +2,7 @@ import Foundation
 
 final class StubGenerator {
 
-    static let path = "/Users/rochab/Desktop/Other/rockbruno.github.io-private/writeit-stubs"
+    static let path = "./writeit-stubs"
 
     static let postNameKey = "WRITEIT_POST_NAME"
     static let postHtmlNameKey = "WRITEIT_POST_HTML_NAME"
