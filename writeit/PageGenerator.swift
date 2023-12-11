@@ -70,7 +70,7 @@ final class PageGenerator {
     }
 
     func structuredJson(fromStub stub: String) -> (Date, String) {
-        let dict = [String:String](uniqueKeysWithValues: stub.properties)
+        let dict = stub.properties
         let title = dict["WRITEIT_POST_NAME"] ?? "No Title"
         let desc = dict["WRITEIT_POST_SHORT_DESCRIPTION"] ?? "No Description"
         let sitemapDate = dict["WRITEIT_POST_SITEMAP_DATE"] ?? "No Date"
@@ -126,7 +126,15 @@ final class PageGenerator {
         let suffix = String(template[startingPos.upperBound...])
         let rawPage = prefix + stub + suffix
         var stubProperties = stub.properties
-        stubProperties.append(("WRITEIT_POST_STRUCTURED_JSON", json))
+        stubProperties["WRITEIT_POST_STRUCTURED_JSON"] = json
+
+        let canonicalKey = "WRITEIT_POST_CANONICAL"
+        if let canonicalUrl = stubProperties[canonicalKey] {
+            stubProperties[canonicalKey] = "<link rel=\"canonical\" href=\"\(canonicalUrl)\" />"
+        } else {
+            stubProperties[canonicalKey] = ""
+        }
+
         return rawPage.replace(properties: stubProperties)
     }
 
@@ -145,7 +153,7 @@ final class PageGenerator {
     }
 
     func addToRss(_ rss: inout [(Date, String)], _ sitemap: inout [(Date, String)], stub: String) {
-        let dict = [String:String](uniqueKeysWithValues: stub.properties)
+        let dict = stub.properties
 
         let title = dict["WRITEIT_POST_NAME"] ?? "No Title"
         let sitemapDate = dict["WRITEIT_POST_SITEMAP_DATE"] ?? "No Date"
@@ -185,6 +193,7 @@ final class PageGenerator {
             <link>https://\(data.get("domain"))/\(html)</link>
             <guid>https://\(data.get("domain"))/\(html)</guid>
             <pubDate>\(rssDateString)</pubDate>
+            <author>\(data.get("owner"))</author>
         <description><![CDATA[\(contents)]]></description>
         </item>
 
@@ -225,7 +234,7 @@ struct Article: Codable, Hashable {
 }
 
 extension String {
-    var properties: [(String, String)] {
+    var properties: [String: String] {
         let regex = try? NSRegularExpression(
             pattern: "<!--(WRITEIT_POST[^=\n]*)=(.*)-->",
             options: []
@@ -234,17 +243,18 @@ extension String {
             in: self,
                     options: [],
                                      range: NSRange(location: 0, length: self.utf16.count))
-        return matches?.compactMap { match -> (String, String) in
+        let arr = matches?.compactMap { match -> (String, String) in
             let nameRange = Range(match.range(at: 1), in: self)
             let valueRange = Range(match.range(at: 2), in: self)
             return (String(self[nameRange!]),
                     String(self[valueRange!]))
         } ?? []
+        return [String:String](uniqueKeysWithValues: arr)
     }
 }
 
 extension String {
-    func replace(properties: [(String, String)]) -> String {
+    func replace(properties: [String: String]) -> String {
         var page = self
         properties.forEach {
             page = page.replacingOccurrences(of: "$\($0.0)", with: $0.1)
