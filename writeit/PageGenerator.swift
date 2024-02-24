@@ -51,6 +51,12 @@ final class PageGenerator {
         stubs.forEach { stub in
             autoreleasepool {
                 let contents = stub.contents
+                defer {
+                    addToRss(&rssContent, &siteMapContent, stub: contents)
+                }
+                guard contents.externalURL == nil else {
+                    return
+                }
                 let structuredJsonData = structuredJson(fromStub: contents)
                 let json = stub.name != "index.html" ? structuredJsonData.1 : finalStructuredJson(data: jsons)
                 jsons.append(structuredJsonData)
@@ -60,7 +66,6 @@ final class PageGenerator {
                     json: json
                 )
                 page.write(toPath: path + "/" + stub.name)
-                addToRss(&rssContent, &siteMapContent, stub: contents)
             }
         }
         let rss = end(rss: rssContent)
@@ -160,21 +165,25 @@ final class PageGenerator {
         let sitemapDateLastMod = dict["WRITEIT_POST_SITEMAP_DATE_LAST_MOD"] ?? "No Date"
         let html = dict["WRITEIT_POST_HTML_NAME"] ?? "No html"
 
-        let siteMapItem = """
-        <url>
-            <loc>https://\(data.get("domain"))/\(html)</loc>
-            <lastmod>\(sitemapDateLastMod)</lastmod>
-            <priority>0.80</priority>
-        </url>
-        <url>
-            <loc>https://\(data.get("domain"))/\(html).html</loc>
-            <lastmod>\(sitemapDateLastMod)</lastmod>
-            <priority>0.80</priority>
-        </url>
+        if stub.externalURL == nil {
 
-        """
+            let siteMapItem = """
+            <url>
+                <loc>https://\(data.get("domain"))/\(html)</loc>
+                <lastmod>\(sitemapDateLastMod)</lastmod>
+                <priority>0.80</priority>
+            </url>
+            <url>
+                <loc>https://\(data.get("domain"))/\(html).html</loc>
+                <lastmod>\(sitemapDateLastMod)</lastmod>
+                <priority>0.80</priority>
+            </url>
 
-        sitemap.append((sitemapDateLastMod.sitemapDate, siteMapItem))
+            """
+
+            sitemap.append((sitemapDateLastMod.sitemapDate, siteMapItem))
+
+        }
 
         if dict["WRITEIT_POST_DONT_RSS"] == "true" {
             return
@@ -187,11 +196,19 @@ final class PageGenerator {
         let rssDateString = rssFormatter.string(from: date)
 
         let contents = stub.replace(properties: stub.properties)
+        let rssLink: String = {
+            if let externalURL = stub.externalURL {
+                return externalURL
+            } else {
+                return "https://\(data.get("domain"))/\(html)"
+            }
+        }()
+
         let item = """
         <item>
             <title>\(title)</title>
-            <link>https://\(data.get("domain"))/\(html)</link>
-            <guid>https://\(data.get("domain"))/\(html)</guid>
+            <link>\(rssLink)</link>
+            <guid>\(rssLink)</guid>
             <pubDate>\(rssDateString)</pubDate>
             <author>\(data.get("owner"))</author>
         <description><![CDATA[\(contents)]]></description>
@@ -250,6 +267,10 @@ extension String {
                     String(self[valueRange!]))
         } ?? []
         return [String:String](uniqueKeysWithValues: arr)
+    }
+
+    var externalURL: String? {
+        return properties["WRITEIT_POST_EXTERNAL_LINK"]
     }
 }
 
