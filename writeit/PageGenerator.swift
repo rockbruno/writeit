@@ -90,7 +90,7 @@ final class PageGenerator {
           "@id": "https://\(data.get("domain"))/\(html)"
         },
         "image": [
-          "https://\(data.get("domain"))/images/logo/logo.png"
+          "https://\(data.get("domain"))/images/thumbs/thumb.jpg"
         ],
         "datePublished": "\(sitemapDate)",
         "dateModified": "\(lastMod)",
@@ -103,7 +103,7 @@ final class PageGenerator {
           "name": "\(data.get("name"))",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://\(data.get("domain"))/images/logo/logo.png"
+            "url": "https://\(data.get("domain"))/images/thumbs/thumb.jpg"
           }
         },
         "headline": "\(title)",
