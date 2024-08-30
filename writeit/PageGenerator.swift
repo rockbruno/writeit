@@ -90,7 +90,7 @@ final class PageGenerator {
           "@id": "https://\(data.get("domain"))/\(html)"
         },
         "image": [
-          "https://\(data.get("domain")).com/images/logo/logo.png"
+          "https://\(data.get("domain"))/images/logo/logo.png"
         ],
         "datePublished": "\(sitemapDate)",
         "dateModified": "\(lastMod)",
@@ -103,7 +103,7 @@ final class PageGenerator {
           "name": "\(data.get("name"))",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://\(data.get("domain")).com/images/logo/logo.png"
+            "url": "https://\(data.get("domain"))/images/logo/logo.png"
           }
         },
         "headline": "\(title)",
@@ -195,12 +195,20 @@ final class PageGenerator {
         rssFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss z"
         let rssDateString = rssFormatter.string(from: date)
 
-        let contents = stub.replace(properties: stub.properties)
         let rssLink: String = {
             if let externalURL = stub.externalURL {
                 return externalURL
             } else {
                 return "https://\(data.get("domain"))/\(html)"
+            }
+        }()
+
+        let contents: String = {
+            let contents = stub.replace(properties: stub.properties)
+            if data.get("rss_swiftrocks_special") == "true" {
+                return contents.rssForSwiftRocks
+            } else {
+                return contents
             }
         }()
 
@@ -271,6 +279,37 @@ extension String {
 
     var externalURL: String? {
         return properties["WRITEIT_POST_EXTERNAL_LINK"]
+    }
+
+    var rssForSwiftRocks: String {
+        let contents = self
+        var idx = contents.startIndex
+        var foundDiv = 0
+        while idx != contents.endIndex {
+            let after = contents.index(idx, offsetBy: 1)
+            let after2 = contents.index(idx, offsetBy: 2)
+            let after3 = contents.index(idx, offsetBy: 3)
+            if contents[idx] == "<" &&
+               contents[after] == "/" &&
+               contents[after2] == "d" &&
+               contents[after3] == "i" {
+                foundDiv += 1
+                if foundDiv == 3 {
+                    let cutPoint = contents.index(idx, offsetBy: 6)
+                    return String(contents[cutPoint...]).cutLastDiv
+                }
+            }
+            idx = after
+        }
+        return contents
+    }
+
+    var cutLastDiv: String {
+        var contents = self
+        while contents.popLast() != "<" {
+            continue
+        }
+        return contents
     }
 }
 
