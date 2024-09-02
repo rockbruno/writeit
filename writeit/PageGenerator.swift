@@ -228,7 +228,10 @@ final class PageGenerator {
     }
 
     func end(rss: [(Date, String)]) -> String {
-        let rssContent = rss.sorted { $0.0 > $1.0 }.map { $0.1 }
+        var rssContent = rss.sorted { $0.0 > $1.0 }.map { $0.1 }
+        if let count = Int(data.get("rss_count")) {
+            rssContent = Array(rssContent.prefix(upTo: count))
+        }
         var rss = rssStart()
         rssContent.forEach { rss += $0 }
         rss += "</channel></rss>"
