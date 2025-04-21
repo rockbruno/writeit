@@ -45,16 +45,16 @@ final class RSSBuilder {
         )
 
         let item = """
-        <item>
-            <title>\(title)</title>
-            <link>\(rssLink)</link>
-            <guid>\(rssLink)</guid>
-            <pubDate>\(rssDateString)</pubDate>
-            <author>\(siteData.owner)</author>
-        <description><![CDATA[\(contents)]]></description>
-        </item>
+            <item>
+                <title>\(title)</title>
+                <link>\(rssLink)</link>
+                <guid>\(rssLink)</guid>
+                <pubDate>\(rssDateString)</pubDate>
+                <author>\(siteData.owner)</author>
+            <description><![CDATA[\(contents)]]></description>
+            </item>
 
-        """
+            """
 
         data.append((sitemapDate, item))
     }
@@ -69,10 +69,9 @@ final class RSSBuilder {
             let after = contents.index(idx, offsetBy: 1)
             let after2 = contents.index(idx, offsetBy: 2)
             let after3 = contents.index(idx, offsetBy: 3)
-            if contents[idx] == "<" &&
-               contents[after] == "/" &&
-               contents[after2] == "d" &&
-               contents[after3] == "i" {
+            if contents[idx] == "<" && contents[after] == "/" && contents[after2] == "d"
+                && contents[after3] == "i"
+            {
                 foundDiv += 1
                 if foundDiv == times {
                     let cutPoint = contents.index(idx, offsetBy: 6)
@@ -90,16 +89,16 @@ final class RSSBuilder {
         let copyright = siteData.copyright
         let domain = siteData.domain
         let rssStart = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-        <channel>
-            <title>\(name)</title>
-            <description>\(description)</description>
-            <language>en-us</language>
-            <copyright>\(copyright)</copyright>
-            <link>https://\(domain)</link>
-            <atom:link href="https://\(domain)/rss.xml" rel="self" type="application/rss+xml"/>
-        """
+            <?xml version="1.0" encoding="utf-8"?>
+            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+            <channel>
+                <title>\(name)</title>
+                <description>\(description)</description>
+                <language>en-us</language>
+                <copyright>\(copyright)</copyright>
+                <link>https://\(domain)</link>
+                <atom:link href="https://\(domain)/rss.xml" rel="self" type="application/rss+xml"/>
+            """
 
         var rssContent = data.sorted { $0.0 > $1.0 }.map { $0.1 }
         if let count = siteData.rssCount {

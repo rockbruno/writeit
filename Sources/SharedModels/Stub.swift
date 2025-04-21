@@ -46,18 +46,20 @@ struct Stub: Hashable {
                 options: [],
                 range: NSRange(location: 0, length: rawContents.utf16.count)
             )
-            let arr = matches?.compactMap { match -> (String, String) in
-                let nameRange = Range(match.range(at: 1), in: rawContents)!
-                let valueRange = Range(match.range(at: 2), in: rawContents)!
-                return (
-                    String(rawContents[nameRange]),
-                    String(rawContents[valueRange])
-                )
-            } ?? []
+            let arr =
+                matches?.compactMap { match -> (String, String) in
+                    let nameRange = Range(match.range(at: 1), in: rawContents)!
+                    let valueRange = Range(match.range(at: 2), in: rawContents)!
+                    return (
+                        String(rawContents[nameRange]),
+                        String(rawContents[valueRange])
+                    )
+                } ?? []
             return [String: String](uniqueKeysWithValues: arr)
         }()
         if rawProperties[Keys.canonical.rawValue] == nil {
-            rawProperties[Keys.canonical.rawValue] = { "https://\(siteData.domain)/$WRITEIT_POST_HTML_NAME"
+            rawProperties[Keys.canonical.rawValue] = {
+                "https://\(siteData.domain)/$WRITEIT_POST_HTML_NAME"
             }()
         }
         self.rawProperties = rawProperties

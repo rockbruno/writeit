@@ -1,8 +1,8 @@
-import Foundation
 import ArgumentParser
+import Foundation
 
 enum NewStubError: LocalizedError {
-    case noStubTemplate // FIXME print path
+    case noStubTemplate  // FIXME print path
 
     var errorDescription: String? {
         switch self {
@@ -20,8 +20,8 @@ struct NewStub: ParsableCommand {
     @Option(help: "The path to the folder where the stub should be stored.")
     var stubsFolder: String = "./writeit-stubs"
 
-//    @Option(help: "Enable verbose logging.")
-//    var verbose: Bool = false
+    //    @Option(help: "Enable verbose logging.")
+    //    var verbose: Bool = false
 
     func run() throws {
         let stubTemplate = File(filePath: stubTemplate)

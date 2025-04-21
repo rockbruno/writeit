@@ -113,33 +113,33 @@ final class GenerateRunner {
         let lastMod = try stub.sitemapDateLastMod
         let htmlName = stub.fileNameWithoutExtension
         return """
-        {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": "https://\(siteData.domain)/\(htmlName)"
-        },
-        "image": [
-          "https://\(siteData.domain)/\(siteData.thumbPath)"
-        ],
-        "datePublished": "\(sitemapDate)",
-        "dateModified": "\(lastMod)",
-        "author": {
-          "@type": "Person",
-          "name": "\(siteData.owner)"
-        },
-         "publisher": {
-          "@type": "Organization",
-          "name": "\(siteData.name)",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://\(siteData.domain)/\(siteData.thumbPath)"
-          }
-        },
-        "headline": "\(title)",
-            "abstract": "\(desc.replacingOccurrences(of: "\"", with: "'"))"
-        }
-        """
+            {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://\(siteData.domain)/\(htmlName)"
+            },
+            "image": [
+              "https://\(siteData.domain)/\(siteData.thumbPath)"
+            ],
+            "datePublished": "\(sitemapDate)",
+            "dateModified": "\(lastMod)",
+            "author": {
+              "@type": "Person",
+              "name": "\(siteData.owner)"
+            },
+             "publisher": {
+              "@type": "Organization",
+              "name": "\(siteData.name)",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://\(siteData.domain)/\(siteData.thumbPath)"
+              }
+            },
+            "headline": "\(title)",
+                "abstract": "\(desc.replacingOccurrences(of: "\"", with: "'"))"
+            }
+            """
     }
 }

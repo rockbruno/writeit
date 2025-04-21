@@ -30,17 +30,18 @@ struct NewStubRunner {
         // FIXME Change license
         // FIXME Template path and blablabla on the json too
         // FIXME also validate that stub doesnt have title and stuff
-        let propertyNames = [ // TODO FIXME: auto fill sitemap stuff? also prints
-            Stub.Keys.title.rawValue
-        ] + customPropertyNames
+        let propertyNames =
+            [  // TODO FIXME: auto fill sitemap stuff? also prints
+                Stub.Keys.title.rawValue
+            ] + customPropertyNames
         let propertyValues = [name, fileName] + customPropertyValues
         let properties = zip(propertyNames, propertyValues)
         var stub = """
 
-        <!--\(Stub.Keys.title.rawValue)-->
+            <!--\(Stub.Keys.title.rawValue)-->
 
 
-        """ + templateContents
+            """ + templateContents
         properties.forEach {
             set(value: $0.1, forPropertyKey: $0.0, inStub: &stub)
         }
@@ -63,11 +64,11 @@ struct NewStubRunner {
                 return nil
             }
             return $0.components(separatedBy: "<!--")
-                     .last?
-                     .components(separatedBy: "-->")
-                     .first
+                .last?
+                .components(separatedBy: "-->")
+                .first
         }
-    } // FIXME: Move?
+    }  // FIXME: Move?
 
     func set(value: String, forPropertyKey key: String, inStub stub: inout String) {
         stub = stub.replacingOccurrences(

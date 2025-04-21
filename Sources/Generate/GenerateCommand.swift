@@ -1,5 +1,5 @@
-import Foundation
 import ArgumentParser
+import Foundation
 
 enum GenerateError: LocalizedError {
     case noSiteData(String)
@@ -16,14 +16,15 @@ enum GenerateError: LocalizedError {
         case .noStubs(let folder):
             return "There are no stubs to generate files from in the provided folder (\(folder))."
         case .noDynamicDiv(let path):
-            return "Could not locate the dynamic content div inside the provided template. (\(path))"
+            return
+                "Could not locate the dynamic content div inside the provided template. (\(path))"
         }
     }
 }
 
 struct Generate: ParsableCommand {
     @Option(help: "The path to the file containing information about the website.")
-    var siteData: String = "./writeit_data.json" // TODO: Better errors with the paths
+    var siteData: String = "./writeit_data.json"  // TODO: Better errors with the paths
 
     @Option(help: "The path to the page template .html file.")
     var pageTemplate: String = "./writeit_page_template.html"
@@ -31,8 +32,8 @@ struct Generate: ParsableCommand {
     @Option(help: "The path to the folder where the stubs are stored.")
     var stubsFolder: String = "./writeit-stubs"
 
-//    @Option(help: "Enable verbose logging.")
-//    var verbose: Bool = false
+    //    @Option(help: "Enable verbose logging.")
+    //    var verbose: Bool = false
 
     func run() throws {
         let siteData = File(filePath: siteData)

@@ -3,10 +3,12 @@ import Foundation
 struct FileManager {
     static func fileExists(atPath path: String) -> Bool {
         var isDir: ObjCBool = false
-        guard Foundation.FileManager.default.fileExists(
-            atPath: path,
-            isDirectory: &isDir
-        ) else {
+        guard
+            Foundation.FileManager.default.fileExists(
+                atPath: path,
+                isDirectory: &isDir
+            )
+        else {
             return false
         }
         return isDir.boolValue == false
@@ -20,10 +22,12 @@ struct FileManager {
             for subpath in suffixPaths {
                 var isDir: ObjCBool = false
                 let fullPath = (path as NSString).appendingPathComponent(subpath)
-                guard fileManager.fileExists(
-                    atPath: fullPath,
-                    isDirectory: &isDir
-                ) else {
+                guard
+                    fileManager.fileExists(
+                        atPath: fullPath,
+                        isDirectory: &isDir
+                    )
+                else {
                     continue
                 }
                 guard fullPath.hasSuffix(suffix) else {

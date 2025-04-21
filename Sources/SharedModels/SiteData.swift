@@ -21,7 +21,7 @@ struct SiteData: Decodable {
     let outputPath: String
     let description: String
     let thumbPath: String
-    let copyright: String?
+    let copyright: String
     let owner: String
     let rssName: String?
     let rssCount: Int?
@@ -51,11 +51,13 @@ struct SiteData: Decodable {
         self.rssName = try container.decodeIfPresent(String.self, forKey: .rss_name)
         self.rssCount = try container.decodeIfPresent(Int.self, forKey: .rss_count)
         self.propertyDepth = (try container.decodeIfPresent(Int.self, forKey: .property_depth)) ?? 2
-        self.rssDivCutCount = (try container.decodeIfPresent(Int.self, forKey: .rss_div_cut_count)) ?? 0
-        self.copyright = (try container.decodeIfPresent(
-            String.self,
-            forKey: .copyright
-        )) ?? "\(owner) \(Calendar.current.component(.year, from: .now))"
+        self.rssDivCutCount =
+            (try container.decodeIfPresent(Int.self, forKey: .rss_div_cut_count)) ?? 0
+        self.copyright =
+            (try container.decodeIfPresent(
+                String.self,
+                forKey: .copyright
+            )) ?? "\(owner) \(Calendar.current.component(.year, from: .now))"
     }
 
     static func create(fromFile file: File) throws -> SiteData {
