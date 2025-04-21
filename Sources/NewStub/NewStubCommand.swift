@@ -20,15 +20,14 @@ struct NewStub: ParsableCommand {
     @Option(help: "The path to the folder where the stub should be stored.")
     var stubsFolder: String = "./writeit-stubs"
 
-    @Option(help: "Enable verbose logging.")
-    var verbose: Bool = false
+//    @Option(help: "Enable verbose logging.")
+//    var verbose: Bool = false
 
     func run() throws {
         let stubTemplate = File(filePath: stubTemplate)
-        try StubGenerator(
+        try NewStubRunner(
             stubTemplate: stubTemplate,
-            stubsFolderPath: stubsFolder,
-            verbose: verbose
+            stubsFolderPath: stubsFolder
         ).run()
     }
 }

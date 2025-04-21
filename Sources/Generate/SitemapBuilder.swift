@@ -20,7 +20,7 @@ final class SitemapBuilder {
     func process(stub: Stub) throws {
         let sitemapDate = try stub.sitemapDate
         let sitemapDateLastMod = try stub.sitemapDateLastMod
-        let htmlName = try stub.htmlName
+        let htmlName = stub.fileNameWithoutExtension
 
         guard stub.externalLink == nil else {
             // Ignore stubs that will not actually be generated

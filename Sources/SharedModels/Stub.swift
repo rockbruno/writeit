@@ -6,7 +6,6 @@ struct Stub: Hashable {
         case title = "WRITEIT_POST_NAME"
         case description = "WRITEIT_POST_SHORT_DESCRIPTION"
         case canonical = "WRITEIT_POST_CANONICAL"
-        case htmlName = "WRITEIT_POST_HTML_NAME" // FIXME: useless?
         case sitemapDate = "WRITEIT_POST_SITEMAP_DATE"
         case sitemapLastMod = "WRITEIT_POST_SITEMAP_DATE_LAST_MOD"
         case externalLink = "WRITEIT_POST_EXTERNAL_LINK"
@@ -24,6 +23,14 @@ struct Stub: Hashable {
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         return dateFormatter
     }()
+
+    var fileNameWithoutExtension: String {
+        return fileName.components(
+            separatedBy: "."
+        ).dropLast().joined(
+            separator: "."
+        )
+    }
 
     init(file: File, siteData: SiteData) throws {
         self.fileName = file.name
@@ -65,12 +72,6 @@ struct Stub: Hashable {
     var description: String {
         get throws {
             try get(property: Keys.description.rawValue)
-        }
-    }
-
-    var htmlName: String {
-        get throws {
-            try get(property: Keys.htmlName.rawValue)
         }
     }
 

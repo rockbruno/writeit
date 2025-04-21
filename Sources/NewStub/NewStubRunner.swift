@@ -1,23 +1,20 @@
 import Foundation
 import os.log
 
-struct StubGenerator {
+struct NewStubRunner {
 
     let stubTemplate: File
     let stubsFolderPath: String
-    let verbose: Bool // FIXME: to introduce w/ a logger
 
     init(
         stubTemplate: File,
-        stubsFolderPath: String,
-        verbose: Bool
+        stubsFolderPath: String
     ) throws {
         guard stubTemplate.exists else {
             throw NewStubError.noStubTemplate
         }
         self.stubTemplate = stubTemplate
         self.stubsFolderPath = stubsFolderPath
-        self.verbose = verbose
     }
 
     func run() throws {
@@ -30,16 +27,17 @@ struct StubGenerator {
         print("Name of the new post: ", terminator: "")
         let name = readLine() ?? ""
         let fileName = generateFileName(forPostName: name)
-        let propertyNames = [
-            Stub.Keys.title.rawValue,
-            Stub.Keys.htmlName.rawValue
+        // FIXME Change license
+        // FIXME Template path and blablabla on the json too
+        // FIXME also validate that stub doesnt have title and stuff
+        let propertyNames = [ // TODO FIXME: auto fill sitemap stuff? also prints
+            Stub.Keys.title.rawValue
         ] + customPropertyNames
         let propertyValues = [name, fileName] + customPropertyValues
         let properties = zip(propertyNames, propertyValues)
         var stub = """
 
         <!--\(Stub.Keys.title.rawValue)-->
-        <!--\(Stub.Keys.htmlName.rawValue)-->
 
 
         """ + templateContents

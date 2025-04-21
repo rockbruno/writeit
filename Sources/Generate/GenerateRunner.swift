@@ -1,31 +1,30 @@
 import Foundation
 
-final class PageGenerator {
+final class GenerateRunner {
 
     let siteData: SiteData
+    let pageTemplate: File
     let templateContents: String
     let stubsFolderPath: String
     let rssBuilder: RSSBuilder
     let sitemapBuilder: SitemapBuilder
-    let verbose: Bool // Todo: implement some prints
 
     init(
         siteData: File,
         pageTemplate: File,
         stubsFolderPath: String,
-        verbose: Bool
     ) throws {
         guard siteData.exists else {
-            throw GenerateError.noSiteData
+            throw GenerateError.noSiteData(siteData.path)
         }
         guard pageTemplate.exists else {
-            throw GenerateError.noPageTemplate
+            throw GenerateError.noPageTemplate(pageTemplate.path)
         }
-        let siteData = try SiteData(file: siteData)
+        let siteData = try SiteData.create(fromFile: siteData)
         self.siteData = siteData
+        self.pageTemplate = pageTemplate
         self.templateContents = try pageTemplate.contents
         self.stubsFolderPath = stubsFolderPath
-        self.verbose = verbose
         self.rssBuilder = RSSBuilder(siteData: siteData)
         self.sitemapBuilder = SitemapBuilder(siteData: siteData)
     }
@@ -40,6 +39,7 @@ final class PageGenerator {
         guard stubs.isEmpty == false else {
             throw GenerateError.noStubs(stubsFolderPath)
         }
+        print("Found \(stubs.count) stubs. Generating...")
         try stubs.forEach { stub in
             try autoreleasepool {
                 if stub.externalLink != nil {
@@ -49,14 +49,17 @@ final class PageGenerator {
                 }
             }
         }
+        print("Generating Sitemap")
         try File.write(
             contents: sitemapBuilder.end(),
             toPath: siteData.outputPath + "/sitemap.xml"
         )
+        print("Generating RSS")
         try File.write(
             contents: rssBuilder.end(),
             toPath: siteData.outputPath + "/rss.xml"
         )
+        print("Success! Results saved to \(siteData.outputPath)")
     }
 
     func handleExternalPost(_ stub: Stub) throws {
@@ -78,7 +81,7 @@ final class PageGenerator {
         // Generate the final result
         let identifier = "id=\"WRITEIT_DYNAMIC_CONTENT\">"
         guard let startingPos = templateContents.range(of: identifier) else {
-            throw GenerateError.noDynamicDiv
+            throw GenerateError.noDynamicDiv(templateContents)
         }
         let prefix = String(
             templateContents[templateContents.startIndex..<startingPos.upperBound]
@@ -108,7 +111,7 @@ final class PageGenerator {
         let desc = try stub.description
         let sitemapDate = try stub.sitemapDateString
         let lastMod = try stub.sitemapDateLastMod
-        let htmlName = try stub.htmlName
+        let htmlName = stub.fileNameWithoutExtension
         return """
         {
         "@context": "https://schema.org",

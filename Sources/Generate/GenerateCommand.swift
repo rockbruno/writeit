@@ -2,46 +2,45 @@ import Foundation
 import ArgumentParser
 
 enum GenerateError: LocalizedError {
-    case noSiteData // FIXME print path
-    case noPageTemplate
+    case noSiteData(String)
+    case noPageTemplate(String)
     case noStubs(String)
-    case noDynamicDiv
+    case noDynamicDiv(String)
 
     var errorDescription: String? {
         switch self {
-        case .noSiteData:
-            return "Site data file not found!"
-        case .noPageTemplate:
-            return "Page template file not found!"
+        case .noSiteData(let path):
+            return "Site data file not found! (\(path))"
+        case .noPageTemplate(let path):
+            return "Page template file not found! (\(path))"
         case .noStubs(let folder):
             return "There are no stubs to generate files from in the provided folder (\(folder))."
-        case .noDynamicDiv:
-            return "Could not locate the dynamic content div inside the template."
+        case .noDynamicDiv(let path):
+            return "Could not locate the dynamic content div inside the provided template. (\(path))"
         }
     }
 }
 
 struct Generate: ParsableCommand {
     @Option(help: "The path to the file containing information about the website.")
-    var siteData: String = "./writeit_data.txt"
-    
+    var siteData: String = "./writeit_data.json" // TODO: Better errors with the paths
+
     @Option(help: "The path to the page template .html file.")
     var pageTemplate: String = "./writeit_page_template.html"
 
     @Option(help: "The path to the folder where the stubs are stored.")
     var stubsFolder: String = "./writeit-stubs"
 
-    @Option(help: "Enable verbose logging.")
-    var verbose: Bool = false
+//    @Option(help: "Enable verbose logging.")
+//    var verbose: Bool = false
 
     func run() throws {
         let siteData = File(filePath: siteData)
         let pageTemplate = File(filePath: pageTemplate)
-        try PageGenerator(
+        try GenerateRunner(
             siteData: siteData,
             pageTemplate: pageTemplate,
-            stubsFolderPath: stubsFolder,
-            verbose: verbose
+            stubsFolderPath: stubsFolder
         ).run()
     }
 }

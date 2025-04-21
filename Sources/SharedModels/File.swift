@@ -2,11 +2,10 @@ import Foundation
 
 struct File: Hashable {
 
-    static let siteData = File(filePath: "./writeit_data.txt")
-
     let path: String
+
     var name: String {
-        return (path as NSString).lastPathComponent
+        return url.lastPathComponent
     }
 
     var contents: String {
@@ -19,8 +18,12 @@ struct File: Hashable {
         return FileManager.fileExists(atPath: path)
     }
 
+    var url: URL {
+        return URL(filePath: path)
+    }
+
     init(filePath: String) {
-        self.path = filePath
+        self.path = URL(filePath: filePath).absoluteURL.path()
     }
 
     static func write(contents: String, toPath path: String) throws {

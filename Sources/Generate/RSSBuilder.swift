@@ -23,7 +23,7 @@ final class RSSBuilder {
         }
 
         let title = try stub.title
-        let htmlName = try stub.htmlName
+        let htmlName = stub.fileNameWithoutExtension
         let sitemapDate = try stub.sitemapDate
         let rssDateString = dateFormatter.string(from: sitemapDate)
 
