@@ -30,7 +30,7 @@ struct Generate: ParsableCommand {
     var pageTemplate: String = "./writeit_page_template.html"
 
     @Option(help: "The path to the folder where the stubs are stored.")
-    var stubsFolder: String = "./writeit-stubs"
+    var stubsFolder: String = "./writeit_stubs"
 
     //    @Option(help: "Enable verbose logging.")
     //    var verbose: Bool = false

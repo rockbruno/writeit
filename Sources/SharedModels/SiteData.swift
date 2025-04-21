@@ -57,7 +57,7 @@ struct SiteData: Decodable {
             (try container.decodeIfPresent(
                 String.self,
                 forKey: .copyright
-            )) ?? "\(owner) \(Calendar.current.component(.year, from: .now))"
+            )) ?? "\(Calendar.current.component(.year, from: .now)) \(owner)"
     }
 
     static func create(fromFile file: File) throws -> SiteData {
