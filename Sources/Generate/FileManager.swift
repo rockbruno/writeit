@@ -2,16 +2,11 @@ import Foundation
 
 struct FileManager {
     static func fileExists(atPath path: String) -> Bool {
-        var isDir: ObjCBool = false
-        guard
-            Foundation.FileManager.default.fileExists(
-                atPath: path,
-                isDirectory: &isDir
-            )
-        else {
-            return false
-        }
-        return isDir.boolValue == false
+        return contentExists(atPath: path, shouldBeDir: false)
+    }
+
+    static func folderExists(atPath path: String) -> Bool {
+        return contentExists(atPath: path, shouldBeDir: true)
     }
 
     static func files(atPath path: String, suffix: String) -> [File] {
@@ -40,5 +35,21 @@ struct FileManager {
             }
         }
         return result.map(File.init)
+    }
+
+    private static func contentExists(
+        atPath path: String,
+        shouldBeDir: Bool
+    ) -> Bool {
+        var isDir: ObjCBool = false
+        guard
+            Foundation.FileManager.default.fileExists(
+                atPath: path,
+                isDirectory: &isDir
+            )
+        else {
+            return false
+        }
+        return isDir.boolValue == shouldBeDir
     }
 }

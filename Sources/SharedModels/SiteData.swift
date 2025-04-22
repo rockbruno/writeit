@@ -42,22 +42,34 @@ struct SiteData: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.domain = try container.decode(String.self, forKey: .domain)
         self.name = try container.decode(String.self, forKey: .name)
+        self.description = try container.decode(String.self, forKey: .description)
+        self.thumbPath = try container.decode(String.self, forKey: .thumbnail_path)
+
+        // Unwrap relative paths
         let _outputPath = try container.decode(String.self, forKey: .output_path)
         self.outputPath = URL(filePath: _outputPath).absoluteURL.path()
-        self.description = try container.decode(String.self, forKey: .description)
+
+        // Owner is used to calculate the default copyright below
         let owner = try container.decode(String.self, forKey: .owner)
         self.owner = owner
-        self.thumbPath = try container.decode(String.self, forKey: .thumbnail_path)
+
+        // Optional properties
         self.rssName = try container.decodeIfPresent(String.self, forKey: .rss_name)
         self.rssCount = try container.decodeIfPresent(Int.self, forKey: .rss_count)
-        self.propertyDepth = (try container.decodeIfPresent(Int.self, forKey: .property_depth)) ?? 2
-        self.rssDivCutCount =
-            (try container.decodeIfPresent(Int.self, forKey: .rss_div_cut_count)) ?? 0
-        self.copyright =
-            (try container.decodeIfPresent(
+
+        // Optional properties w/ default values
+        self.propertyDepth = (
+            try container.decodeIfPresent(Int.self, forKey: .property_depth)
+        ) ?? 2
+        self.rssDivCutCount = (
+            try container.decodeIfPresent(Int.self, forKey: .rss_div_cut_count)
+        ) ?? 0
+        self.copyright = (
+            try container.decodeIfPresent(
                 String.self,
                 forKey: .copyright
-            )) ?? "\(Calendar.current.component(.year, from: .now)) \(owner)"
+            )
+        ) ?? "\(Calendar.current.component(.year, from: .now)) \(owner)"
     }
 
     static func create(fromFile file: File) throws -> SiteData {

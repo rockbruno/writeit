@@ -24,7 +24,7 @@ enum GenerateError: LocalizedError {
 
 struct Generate: ParsableCommand {
     @Option(help: "The path to the file containing information about the website.")
-    var siteData: String = "./writeit_data.json"  // TODO: Better errors with the paths
+    var siteData: String = "./writeit_data.json"
 
     @Option(help: "The path to the page template .html file.")
     var pageTemplate: String = "./writeit_page_template.html"
@@ -41,7 +41,7 @@ struct Generate: ParsableCommand {
         try GenerateRunner(
             siteData: siteData,
             pageTemplate: pageTemplate,
-            stubsFolderPath: stubsFolder
+            stubsFolderPath: URL(filePath: stubsFolder).absoluteURL.path()
         ).run()
     }
 }
@@ -50,7 +50,7 @@ struct Generate: ParsableCommand {
 struct WriteIt: ParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Static website generator by Bruno Rocha (rockbruno.com)",
-        subcommands: [Generate.self, NewStub.self],
+        subcommands: [Generate.self, New.self],
         defaultSubcommand: Generate.self
     )
 }

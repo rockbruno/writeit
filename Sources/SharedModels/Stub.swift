@@ -17,7 +17,7 @@ struct Stub: Hashable {
     let rawContents: String
     let rawProperties: [String: String]
 
-    private let sitemapDateFormatter: DateFormatter = {
+    static let sitemapDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -86,7 +86,7 @@ struct Stub: Hashable {
     var sitemapDate: Date {
         get throws {
             let dateString = try sitemapDateString
-            guard let date = sitemapDateFormatter.date(from: dateString) else {
+            guard let date = Self.sitemapDateFormatter.date(from: dateString) else {
                 throw StubError.cannotConvertSiteMapDate(fileName, dateString)
             }
             return date

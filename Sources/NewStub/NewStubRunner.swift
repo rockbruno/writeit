@@ -11,7 +11,10 @@ struct NewStubRunner {
         stubsFolderPath: String
     ) throws {
         guard stubTemplate.exists else {
-            throw NewStubError.noStubTemplate
+            throw NewStubError.noStubTemplate(stubTemplate.path)
+        }
+        guard FileManager.folderExists(atPath: stubsFolderPath) else {
+            throw NewStubError.noStubFolder(stubsFolderPath)
         }
         self.stubTemplate = stubTemplate
         self.stubsFolderPath = stubsFolderPath
@@ -19,46 +22,82 @@ struct NewStubRunner {
 
     func run() throws {
         let templateContents = try stubTemplate.contents
-        let customPropertyNames = getCustomProperties(fromStubContents: templateContents)
-        let customPropertyValues: [String] = customPropertyNames.map {
-            print("Value for \($0): ", terminator: "")
-            return readLine() ?? ""
-        }
-        print("Name of the new post: ", terminator: "")
-        let name = readLine() ?? ""
+        let customPropertyNames = Set(getCustomProperties(
+            fromStubContents: templateContents
+        ))
+        var propertyValues = [String: String]()
+
+        // Autofill sitemap properties
+        let now = Stub.sitemapDateFormatter.string(from: .now)
+        propertyValues[Stub.Keys.sitemapDate.rawValue] = now
+        propertyValues[Stub.Keys.sitemapLastMod.rawValue] = now
+
+        print("Type the title of the new post: ", terminator: "")
+        let name = getAnswer()
         let fileName = generateFileName(forPostName: name)
-        // FIXME Change license
-        // FIXME Template path and blablabla on the json too
-        // FIXME also validate that stub doesnt have title and stuff
-        let propertyNames =
-            [  // TODO FIXME: auto fill sitemap stuff? also prints
-                Stub.Keys.title.rawValue
-            ] + customPropertyNames
-        let propertyValues = [name, fileName] + customPropertyValues
-        let properties = zip(propertyNames, propertyValues)
-        var stub = """
+        propertyValues[Stub.Keys.title.rawValue] = name
 
-            <!--\(Stub.Keys.title.rawValue)-->
+        // Don't duplicate data for things we already filled
+        let remainingPropertiesToFill = customPropertyNames.filter {
+            propertyValues[$0] == nil
+        }
 
+        for property in remainingPropertiesToFill.sorted() {
+            print("Type the value for \(property): ", terminator: "")
+            propertyValues[property] = getAnswer()
+        }
 
-            """ + templateContents
-        properties.forEach {
+        var stub = ""
+
+        addPropertyIfNeeded(
+            key: .title,
+            properties: customPropertyNames,
+            stub: &stub
+        )
+        addPropertyIfNeeded(
+            key: .sitemapDate,
+            properties: customPropertyNames,
+            stub: &stub
+        )
+        addPropertyIfNeeded(
+            key: .sitemapLastMod,
+            properties: customPropertyNames,
+            stub: &stub
+        )
+
+        stub += "\n" + templateContents
+
+        propertyValues.forEach {
             set(value: $0.1, forPropertyKey: $0.0, inStub: &stub)
         }
+
+        let resultPath = stubsFolderPath + "/" + fileName + ".html"
         try File.write(
             contents: stub,
-            toPath: stubsFolderPath + "/" + fileName + ".html"
+            toPath: resultPath
         )
+
+        print("Done! Result written to \(resultPath)")
     }
 
-    func generateFileName(forPostName name: String) -> String {
+    private func addPropertyIfNeeded(key: Stub.Keys, properties: Set<String>, stub: inout String) {
+        guard properties.contains(key.rawValue) == false else {
+            return
+        }
+        stub += """
+        <!--\(key.rawValue)-->
+
+        """
+    }
+
+    private func generateFileName(forPostName name: String) -> String {
         var validSet = CharacterSet.alphanumerics
         validSet.insert(" ")
         let alphaOnly = name.components(separatedBy: validSet.inverted).joined()
         return alphaOnly.lowercased().replacingOccurrences(of: " ", with: "-")
     }
 
-    func getCustomProperties(fromStubContents contents: String) -> [String] {
+    private func getCustomProperties(fromStubContents contents: String) -> [String] {
         return contents.components(separatedBy: "\n").compactMap {
             guard $0.hasPrefix("<!--WRITEIT_POST") && $0.hasSuffix("-->") else {
                 return nil
@@ -68,9 +107,21 @@ struct NewStubRunner {
                 .components(separatedBy: "-->")
                 .first
         }
-    }  // FIXME: Move?
+    }
 
-    func set(value: String, forPropertyKey key: String, inStub stub: inout String) {
+    private func getAnswer() -> String {
+        guard let result = readLine(), result.isEmpty == false else {
+            print("Answers cannot be empty. Please try again: ", terminator: "")
+            return getAnswer()
+        }
+        return result
+    }
+
+    private func set(
+        value: String,
+        forPropertyKey key: String,
+        inStub stub: inout String
+    ) {
         stub = stub.replacingOccurrences(
             of: "<!--\(key)-->",
             with: "<!--\(key)=\(value)-->"
