@@ -1,0 +1,1 @@
+writeit generate --site-data ./example.json --page-template ./page_template.html --stubs-folder ./stubs

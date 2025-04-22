@@ -1,0 +1,10 @@
+{
+  "domain": "domain.com",
+  "output_path": "./generated",
+  "name": "MyBlog",
+  "description": "MyBlogIsCool",
+  "owner": "John Doe",
+  "rss_count": 20,
+  "rss_name": "MyBlog",
+  "thumbnail_path": "images/thumbs/thumb.jpg"
+}

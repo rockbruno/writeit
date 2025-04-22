@@ -99,9 +99,8 @@ final class RSSBuilder {
                 <link>https://\(domain)</link>
                 <atom:link href="https://\(domain)/rss.xml" rel="self" type="application/rss+xml"/>
             """
-
         var rssContent = data.sorted { $0.0 > $1.0 }.map { $0.1 }
-        if let count = siteData.rssCount {
+        if let count = siteData.rssCount, count < rssContent.count {
             rssContent = Array(rssContent.prefix(upTo: count))
         }
         var rss = rssStart

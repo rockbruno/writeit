@@ -47,7 +47,7 @@ struct NewStubRunner {
             propertyValues[property] = getAnswer()
         }
 
-        var stub = ""
+        var stub = "\n"
 
         addPropertyIfNeeded(
             key: .title,
