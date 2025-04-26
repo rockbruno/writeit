@@ -10,8 +10,12 @@ WriteIt can also assist in the creation of new posts by bootstrapping a started 
 
 ## Installation
 
-Download the latest release and put it in your /usr/local/bin (or wherever else you'd like it), or build it from source via Swift Package Manager.
+Download the latest release and put it in your `/usr/local/bin` (or wherever else you'd like it), or build it from source via Swift Package Manager:
 
-## Usage
+```bash
+swift build -c release
+```
 
-I currently do not provide support on how to use this as this was developed for personal use, but am working on proper documentation that would allow others to more easily make use of it.
+## USAGE
+
+See [usage.md](docs/usage.md) for documentation and instructions on how to get started.
