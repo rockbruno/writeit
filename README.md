@@ -18,4 +18,4 @@ swift build -c release
 
 ## USAGE
 
-WriteIt was developed for personal usage, so no docs or support is available at the time.
+WriteIt was developed for personal usage, so no docs or support is available at this time.
