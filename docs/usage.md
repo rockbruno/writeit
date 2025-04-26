@@ -29,3 +29,7 @@ The *Site Data* is a JSON describing the general metadata of your website. This 
 | rss_count (optional) |  The maximum number of entries that the RSS file should contain.  |  all pages |
 | property_depth (optional) |  If one of your templates happens to contain "nested" WriteIt properties, increase this value to match the depth of the nesting. Otherwise, they will not be resolved properly.  |  2 |
 | rss_div_cut_count (optional) |  If provided, WriteIt will skip the first X divs of a page when determining what should be included in the RSS entry for that page.   |  0 |
+
+## Setting up the page template file
+
+TODO

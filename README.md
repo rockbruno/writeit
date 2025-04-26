@@ -18,4 +18,4 @@ swift build -c release
 
 ## USAGE
 
-See [usage.md](docs/usage.md) for documentation and instructions on how to get started.
+WriteIt was developed for personal usage, so no docs or support is available at the time.
