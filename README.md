@@ -16,6 +16,6 @@ Download the latest release and put it in your `/usr/local/bin` (or wherever els
 swift build -c release
 ```
 
-## USAGE
+## Usage
 
 WriteIt was developed for personal usage, so no docs or support is available at this time.
