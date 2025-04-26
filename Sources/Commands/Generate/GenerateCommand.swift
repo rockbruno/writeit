@@ -45,12 +45,3 @@ struct Generate: ParsableCommand {
         ).run()
     }
 }
-
-@main
-struct WriteIt: ParsableCommand {
-    static let configuration = CommandConfiguration(
-        abstract: "Static website generator by Bruno Rocha (rockbruno.com)",
-        subcommands: [Generate.self, New.self],
-        defaultSubcommand: Generate.self
-    )
-}

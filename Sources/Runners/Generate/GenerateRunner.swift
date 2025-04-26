@@ -3,6 +3,7 @@ import Foundation
 final class GenerateRunner {
 
     let siteData: SiteData
+    let _siteDataFile: File
     let pageTemplate: File
     let templateContents: String
     let stubsFolderPath: String
@@ -20,6 +21,7 @@ final class GenerateRunner {
         guard pageTemplate.exists else {
             throw GenerateError.noPageTemplate(pageTemplate.path)
         }
+        self._siteDataFile = siteData
         let siteData = try SiteData.create(fromFile: siteData)
         self.siteData = siteData
         self.pageTemplate = pageTemplate
@@ -30,6 +32,10 @@ final class GenerateRunner {
     }
 
     func run() throws {
+        Logger.default("Using site data: \(_siteDataFile.path)")
+        Logger.default("Using page template: \(pageTemplate.path)")
+        Logger.default("Using stubs folder path: \(stubsFolderPath)")
+        print("")
         let stubs = try FileManager.files(
             atPath: stubsFolderPath,
             suffix: ".html"
@@ -39,7 +45,7 @@ final class GenerateRunner {
         guard stubs.isEmpty == false else {
             throw GenerateError.noStubs(stubsFolderPath)
         }
-        print("Found \(stubs.count) stubs. Generating...")
+        Logger.info("Found \(stubs.count) stubs. Processing...")
         try stubs.forEach { stub in
             try autoreleasepool {
                 if stub.externalLink != nil {
@@ -49,17 +55,17 @@ final class GenerateRunner {
                 }
             }
         }
-        print("Generating Sitemap")
+        Logger.info("Processing Sitemap...")
         try File.write(
             contents: sitemapBuilder.end(),
             toPath: siteData.outputPath + "/sitemap.xml"
         )
-        print("Generating RSS")
+        Logger.info("Processing RSS...")
         try File.write(
             contents: rssBuilder.end(),
             toPath: siteData.outputPath + "/rss.xml"
         )
-        print("Success! Results saved to \(siteData.outputPath)")
+        Logger.success("Success! Results saved to \(siteData.outputPath)")
     }
 
     func handleExternalPost(_ stub: Stub) throws {

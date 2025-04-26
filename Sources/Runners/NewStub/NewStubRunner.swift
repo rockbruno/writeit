@@ -21,6 +21,8 @@ struct NewStubRunner {
     }
 
     func run() throws {
+        Logger.default("Using stub template: \(stubTemplate.path)")
+        Logger.default("Using stubs folder path: \(stubsFolderPath)")
         let templateContents = try stubTemplate.contents
         let customPropertyNames = Set(getCustomProperties(
             fromStubContents: templateContents
@@ -32,7 +34,7 @@ struct NewStubRunner {
         propertyValues[Stub.Keys.sitemapDate.rawValue] = now
         propertyValues[Stub.Keys.sitemapLastMod.rawValue] = now
 
-        print("Type the title of the new post: ", terminator: "")
+        Logger.question("What will be the name of this post? (you can edit this later if needed)")
         let name = getAnswer()
         let fileName = generateFileName(forPostName: name)
         propertyValues[Stub.Keys.title.rawValue] = name
@@ -43,11 +45,14 @@ struct NewStubRunner {
         }
 
         for property in remainingPropertiesToFill.sorted() {
-            print("Type the value for \(property): ", terminator: "")
+            Logger.question("What should be the value for \(property)? (you can edit this later if needed)")
             propertyValues[property] = getAnswer()
         }
 
         var stub = "\n"
+
+        print("")
+        Logger.info("Adding default properties...")
 
         addPropertyIfNeeded(
             key: .title,
@@ -67,6 +72,8 @@ struct NewStubRunner {
 
         stub += "\n" + templateContents
 
+        Logger.info("Generating stub...")
+
         propertyValues.forEach {
             set(value: $0.1, forPropertyKey: $0.0, inStub: &stub)
         }
@@ -77,7 +84,7 @@ struct NewStubRunner {
             toPath: resultPath
         )
 
-        print("Done! Result written to \(resultPath)")
+        Logger.success("Done! Stub written to \(resultPath)")
     }
 
     private func addPropertyIfNeeded(key: Stub.Keys, properties: Set<String>, stub: inout String) {
@@ -110,8 +117,9 @@ struct NewStubRunner {
     }
 
     private func getAnswer() -> String {
+        print("> ", terminator: "")
         guard let result = readLine(), result.isEmpty == false else {
-            print("Answers cannot be empty. Please try again: ", terminator: "")
+            Logger.error("Answers cannot be empty. Please try again.")
             return getAnswer()
         }
         return result
