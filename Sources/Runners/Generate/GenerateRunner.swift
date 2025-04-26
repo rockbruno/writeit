@@ -2,8 +2,8 @@ import Foundation
 
 final class GenerateRunner {
 
+    let siteDataFile: File
     let siteData: SiteData
-    let _siteDataFile: File
     let pageTemplate: File
     let templateContents: String
     let stubsFolderPath: String
@@ -21,7 +21,7 @@ final class GenerateRunner {
         guard pageTemplate.exists else {
             throw GenerateError.noPageTemplate(pageTemplate.path)
         }
-        self._siteDataFile = siteData
+        self.siteDataFile = siteData
         let siteData = try SiteData.create(fromFile: siteData)
         self.siteData = siteData
         self.pageTemplate = pageTemplate
@@ -32,7 +32,7 @@ final class GenerateRunner {
     }
 
     func run() throws {
-        Logger.default("Using site data: \(_siteDataFile.path)")
+        Logger.default("Using site data: \(siteDataFile.path)")
         Logger.default("Using page template: \(pageTemplate.path)")
         Logger.default("Using stubs folder path: \(stubsFolderPath)")
         print("")
