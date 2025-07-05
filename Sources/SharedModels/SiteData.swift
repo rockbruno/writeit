@@ -14,6 +14,7 @@ struct SiteData: Decodable {
         case property_depth
         case rss_div_cut_count
         case rss_count
+        case rss_filename
     }
 
     let domain: String
@@ -27,6 +28,7 @@ struct SiteData: Decodable {
     let rssCount: Int?
     let propertyDepth: Int
     let rssDivCutCount: Int
+    let rssFileName: String
 
     private static func get(
         _ key: String,
@@ -70,6 +72,9 @@ struct SiteData: Decodable {
                 forKey: .copyright
             )
         ) ?? "\(Calendar.current.component(.year, from: .now)) \(owner)"
+        self.rssFileName = (
+            try container.decodeIfPresent(String.self, forKey: .rss_filename)
+        ) ?? "atom.xml"
     }
 
     static func create(fromFile file: File) throws -> SiteData {

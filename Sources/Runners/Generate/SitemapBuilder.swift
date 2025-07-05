@@ -4,13 +4,6 @@ final class SitemapBuilder {
 
     let siteData: SiteData
 
-    private let dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return dateFormatter
-    }()
-
     private var data: [(Date, String, String)] = []
 
     init(siteData: SiteData) {
@@ -19,7 +12,7 @@ final class SitemapBuilder {
 
     func process(stub: Stub) throws {
         let sitemapDate = try stub.sitemapDate
-        let sitemapDateLastMod = try stub.sitemapDateLastMod
+        let sitemapDateLastMod = try stub.sitemapDateLastModString
         let htmlName = stub.fileNameWithoutExtension
 
         guard stub.externalLink == nil else {

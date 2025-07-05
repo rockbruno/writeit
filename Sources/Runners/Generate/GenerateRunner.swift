@@ -63,7 +63,7 @@ final class GenerateRunner {
         Logger.info("Processing RSS...")
         try File.write(
             contents: rssBuilder.end(),
-            toPath: siteData.outputPath + "/rss.xml"
+            toPath: siteData.outputPath + "/\(siteData.rssFileName)"
         )
         Logger.success("Success! Results saved to \(siteData.outputPath)")
     }
@@ -116,7 +116,7 @@ final class GenerateRunner {
         let title = try stub.title
         let desc = try stub.description
         let sitemapDate = try stub.sitemapDateString
-        let lastMod = try stub.sitemapDateLastMod
+        let lastMod = try stub.sitemapDateLastModString
         let htmlName = stub.fileNameWithoutExtension
         return """
             {

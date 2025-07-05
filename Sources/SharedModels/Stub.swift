@@ -93,9 +93,19 @@ struct Stub: Hashable {
         }
     }
 
-    var sitemapDateLastMod: String {
+    var sitemapDateLastModString: String {
         get throws {
             try get(property: Keys.sitemapLastMod.rawValue)
+        }
+    }
+
+    var sitemapDateLastMod: Date {
+        get throws {
+            let dateString = try sitemapDateLastModString
+            guard let date = Self.sitemapDateFormatter.date(from: dateString) else {
+                throw StubError.cannotConvertSiteMapDate(fileName, dateString)
+            }
+            return date
         }
     }
 
