@@ -18,4 +18,4 @@ swift build -c release
 
 ## Usage
 
-WriteIt was developed for personal usage, so no docs or support is available at this time.
+Since I developed WriteIt for myself, I have no plans to provide support or detailed docs. Your best bet would be to check out the provide example project and infer everything else out from it in addition to the source code.
