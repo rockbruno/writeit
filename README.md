@@ -1,5 +1,5 @@
 # WriteIt
-## 💻 macOS CLI static HTML page generator for blogs
+## 💻 macOS CLI-based static HTML page generator for blogs
 
 Given a template html file containing a placeholder `<div>` and a list of "content" files (like blog posts), WriteIt merges the two together to generate a complete static website. This is used by https://swiftrocks.com to effortlessly publish a static website where the pages all have the same "shell", but with different contents:
 
