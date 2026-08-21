@@ -11,6 +11,7 @@ struct Stub: Hashable {
         case externalLink = "WRITEIT_POST_EXTERNAL_LINK"
         case dontRSS = "WRITEIT_POST_DONT_RSS"
         case structuredJson = "WRITEIT_POST_STRUCTURED_JSON"
+        case htmlName = "WRITEIT_POST_HTML_NAME"
     }
 
     let fileName: String
@@ -60,6 +61,11 @@ struct Stub: Hashable {
         if rawProperties[Keys.canonical.rawValue] == nil {
             rawProperties[Keys.canonical.rawValue] = {
                 "https://\(siteData.domain)/$WRITEIT_POST_HTML_NAME"
+            }()
+        }
+        if rawProperties[Keys.htmlName.rawValue] == nil {
+            rawProperties[Keys.htmlName.rawValue] = {
+                (file.name as NSString).deletingPathExtension
             }()
         }
         self.rawProperties = rawProperties
